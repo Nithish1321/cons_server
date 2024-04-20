@@ -1,65 +1,77 @@
 const bycrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const createError = require("../utils/appError");
 const User = require("../modals/userModal");
+
 exports.signup = async (req, res, next) => {
   try {
     const { name, email, phone, password } = req.body;
-
-    if (!(name && email && phone && password)) {
-      res.status(400).send("All fields are comulsory");
-    }
+    console.log(name, email, phone, password);
 
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      res.status(401).send("User already exist with this email");
+      return next(new createError("User already exist!", 400));
     }
 
-    const encryptedPassword = bycrypt.hash(password, 10);
+    const encryptedPassword = await bycrypt.hash(password, 12);
 
-    const user = await User.create({
+    const newUser = await User.create({
       name,
       email,
       phone,
       password: encryptedPassword,
     });
-    const token = jwt.sign(
-      { id: user._id, email },
-      `${process.env.JWT_SECRET}`,
-      {
-        expiresIn: "2h",
-      }
-    );
-    user.token = token;
-    user.password = undefined;
-    res.status(201).json(user);
+    const token = jwt.sign({ _id: newUser._id }, `${process.env.JWT_SECRET}`, {
+      expiresIn: "12h",
+    });
+
+    res.status(201).json({
+      status: "success",
+      message: "user registered successfully",
+      token,
+    });
   } catch (err) {
-    console.log(err);
+    next(err);
   }
 };
 
 exports.signin = async (req, res, next) => {
   try {
     const { email, password } = req.body;
-    if (!(email && password)) {
-      res.status(400).send("Enter every details");
-    }
+
     const user = await User.findOne({ email });
-    if (!user) {
-      res.status(400).send("User not found");
-    }
+    if (!user) return next(new createError("User not found!", 404));
+
     const isPasswordTrue = await bycrypt.compare(password, user.password);
-    if (user && isPasswordTrue) {
-      const token = jwt.sign(
-        { id: user._id, email },
-        `${process.env.JWT_SECRET}`,
-        {
-          expiresIn: "2h",
-        }
-      );
-      user.token = token;
-      user.password = undefined;
+    if (!isPasswordTrue) {
+      return next(new createError("Invalid password", 401));
     }
+
+    const token = jwt.sign({ _id: user._id }, `${process.env.JWT_SECRET}`, {
+      expiresIn: "12h",
+    });
+
+    res.status(200).json({
+      status: "success",
+      token,
+      message: "Logged in successfully",
+      user: {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+      },
+    });
+
+    // const options = {
+    //   expires: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
+    //   httpOnly: true,
+    // };
+    // res.status(200).cookie("token", token, options).json({
+    //   success: true,
+    //   token,
+    //   user,
+    // });
   } catch (err) {
-    console.log(err);
+    next(err);
   }
 };

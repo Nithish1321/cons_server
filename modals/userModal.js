@@ -1,5 +1,12 @@
 const mongoose = require("mongoose");
 
+// const cartItemSchema = new mongoose.Schema({
+//   id: String,
+//   price: Number,
+//   quantity: Number,
+//   totalPrice: Number,
+//   productName: String,
+// });
 const userSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -14,17 +21,18 @@ const userSchema = new mongoose.Schema({
   phone: {
     type: Number,
     required: [true, "Please provide your phone number"],
-    unique: true,
   },
   password: {
     type: String,
     required: [true, "Please provide a password"],
-    minlength: 8,
   },
-  token: {
-    type:String,
-    default:null
-  },
+  // cart: {
+  //   items: [cartItemSchema],
+  //   totalQuantity: {
+  //     type: Number,
+  //     default: 0,
+  //   },
+  // },
 });
 
 const User = mongoose.model("User", userSchema);
