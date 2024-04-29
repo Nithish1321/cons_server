@@ -5,7 +5,7 @@ const User = require("../modals/userModal");
 
 exports.signup = async (req, res, next) => {
   try {
-    const { name, email, phone, password } = req.body;
+    const { name, email, phone, password, address, city, pincode } = req.body;
     console.log(name, email, phone, password);
 
     const existingUser = await User.findOne({ email });
@@ -20,6 +20,9 @@ exports.signup = async (req, res, next) => {
       email,
       phone,
       password: encryptedPassword,
+      address,
+      city,
+      pincode,
     });
     const token = jwt.sign({ _id: newUser._id }, `${process.env.JWT_SECRET}`, {
       expiresIn: "12h",
@@ -40,7 +43,7 @@ exports.signin = async (req, res, next) => {
     const { email, password } = req.body;
 
     const user = await User.findOne({ email });
-    if (!user) return next(new createError("User not found!", 404));
+    if (!user) return next(new createError("User not found!", 401));
 
     const isPasswordTrue = await bycrypt.compare(password, user.password);
     if (!isPasswordTrue) {
@@ -59,6 +62,12 @@ exports.signin = async (req, res, next) => {
         _id: user._id,
         name: user.name,
         email: user.email,
+        phone:user.phone,
+        shippingAddress: {
+          street: user.address,
+          city: user.city,
+          pincode: user.pincode,
+        },
       },
     });
 

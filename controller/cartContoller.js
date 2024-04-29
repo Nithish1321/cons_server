@@ -34,3 +34,21 @@ exports.sendCartData = async (req, res) => {
     console.log(error);
   }
 };
+
+exports.deleteCartData = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    // Delete cart data from the database
+    const deletedCart = await Cart.findOneAndDelete({ userId }); // Adjust this based on your cart schema
+
+    if (!deletedCart) {
+      return res.status(404).json({ error: "Cart data not found" });
+    }
+
+    res.status(200).json({ message: "Cart data deleted successfully" });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};

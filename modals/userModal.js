@@ -26,6 +26,18 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: [true, "Please provide a password"],
   },
+  address: {
+    type: String,
+    required: [true, "Please provide a address"],
+  },
+  city: {
+    type: String,
+    required: [true, "Please provide a city"],
+  },
+  pincode: {
+    type: Number,
+    required: [true, "Please provide a pincode"],
+  },
   // cart: {
   //   items: [cartItemSchema],
   //   totalQuantity: {
