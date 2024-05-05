@@ -62,7 +62,7 @@ exports.signin = async (req, res, next) => {
         _id: user._id,
         name: user.name,
         email: user.email,
-        phone:user.phone,
+        phone: user.phone,
         shippingAddress: {
           street: user.address,
           city: user.city,
@@ -70,16 +70,6 @@ exports.signin = async (req, res, next) => {
         },
       },
     });
-
-    // const options = {
-    //   expires: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
-    //   httpOnly: true,
-    // };
-    // res.status(200).cookie("token", token, options).json({
-    //   success: true,
-    //   token,
-    //   user,
-    // });
   } catch (err) {
     next(err);
   }

@@ -1,4 +1,5 @@
 const User = require("../modals/userModal");
+
 exports.changeUserAddress = async (req, res, next) => {
   try {
     const userId = req.params.userId;
@@ -36,3 +37,4 @@ exports.changeUserAddress = async (req, res, next) => {
     next(err);
   }
 };
+

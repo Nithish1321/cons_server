@@ -1,42 +1,19 @@
 const mongoose = require("mongoose");
-function generateRandomOrderId() {
-  return Math.floor(1000 + Math.random() * 9000);
-}
+const Schema = mongoose.Schema;
 const orderSchema = new mongoose.Schema({
-  orderId: {
-    type: Number,
-    default: generateRandomOrderId,
-    required: true,
-    unique: true,
-  },
-  customerId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
-    required: true,
-  },
+  payment_id: String,
+  razorpay_order_id: String,
+  user: { type: Schema.Types.ObjectId, ref: "User" },
   products: [
     {
-      productId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Product",
-        required: true,
-      },
-      quantity: {
-        type: Number,
-        required: true,
-        default: 1,
-      },
+      _id: String,
+      name: String,
+      quantity: Number,
     },
   ],
-  date: {
-    type: Date,
-    default: Date.now,
-  },
-  billAmount: {
-    type: Number,
-    required: true,
-  },
+  billAmount: Number,
+  status: String,
+  totalQuantity: Number,
 });
-
 const Order = mongoose.model("Order", orderSchema);
 module.exports = Order;

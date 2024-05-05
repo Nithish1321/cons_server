@@ -11,6 +11,10 @@ router.route("/:userId").patch(userController.changeUserAddress);
 router.route("/cart/:userId").get(cartContoller.fetchCartData);
 router.route("/cart/:userId").put(cartContoller.sendCartData);
 router.route("/cart/:userId").delete(cartContoller.deleteCartData);
-router.route("/orders").post(ordersController.createOrder);
+router.route("/order").post(ordersController.createUserOrder);
+router.route("/orders/:orderId").delete(ordersController.deleteUserOrder);
+router.route("/orders/:userId").get(ordersController.getUserOrder);
+router.route("/orders/razor").post(ordersController.createOrder);
 router.route("/orders/validate").post(ordersController.validateOrder);
+
 module.exports = router;

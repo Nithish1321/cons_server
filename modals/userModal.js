@@ -1,12 +1,5 @@
 const mongoose = require("mongoose");
-
-// const cartItemSchema = new mongoose.Schema({
-//   id: String,
-//   price: Number,
-//   quantity: Number,
-//   totalPrice: Number,
-//   productName: String,
-// });
+const Schema = mongoose.Schema;
 const userSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -38,13 +31,7 @@ const userSchema = new mongoose.Schema({
     type: Number,
     required: [true, "Please provide a pincode"],
   },
-  // cart: {
-  //   items: [cartItemSchema],
-  //   totalQuantity: {
-  //     type: Number,
-  //     default: 0,
-  //   },
-  // },
+  orders: [{ type: Schema.Types.ObjectId, ref: "Order" }],
 });
 
 const User = mongoose.model("User", userSchema);
