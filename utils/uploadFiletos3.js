@@ -1,5 +1,5 @@
-import s3Client from "./s3.config.js";
-import { DeleteObjectCommand, PutObjectCommand } from "@aws-sdk/client-s3";
+const {s3Client} = require("./s3.config.js");
+const { DeleteObjectCommand, PutObjectCommand } = require("@aws-sdk/client-s3");
 
 async function uploadFileToS3(fileBuffer, fileName, folder) {
     const params = {
@@ -24,5 +24,7 @@ async function deleteFileFromS3(key){
     await s3Client.send(command)
 }
 
-
-export  {uploadFileToS3, deleteFileFromS3}
+module.exports = {
+    uploadFileToS3,
+    deleteFileFromS3
+};

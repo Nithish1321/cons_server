@@ -1,71 +1,70 @@
 const Product = require("../modals/productModal");
-// const multer = require("multer");
-// const sharp = require("sharp");
-// const storage = multer.memoryStorage();
-// const createError = require("../utils/appError");
-// import { uploadFileToS3 } from "../utils/uploadFiletos3";
-// const fileFilter = (req, file, cb) => {
-//   if (file.mimetype.split("/")[0] === "image") {
-//     cb(null, true);
-//   } else {
-//     cb(new multer.MulterError("LIMIT_UNEXPECTED_FILE"), false);
-//   }
-// };
+const multer = require("multer");
+const sharp = require("sharp");
+const { uploadFileToS3 } = require("../utils/uploadFiletos3.js");
 
-// const upload = multer({
-//   storage,
-//   fileFilter,
-//   limits: { fileSize: 1000000000, files: 5 },
-// });
+const upload = multer();
 
-// export const addProduct = async (req, res, next) => {
-//   try {
-//     upload.single("image")(req, res, async (error) => {
-//       const files = req.file;
-
-//       if (error) {
-//         return next(error);
-//       }
-//       if (!req.files || req.files.length === 0) {
-//         const noFilesError = new createError("No files were provided", 400);
-//         return next(noFilesError);
-//       }
-//       const buffer = await sharp(file.buffer)
-//         .resize({ width: 500, height: 500 })
-//         .toBuffer();
-//       const { originalName } = file;
-//       const imageUrl = await uploadFileToS3(
-//         buffer,
-//         originalName,
-//         `products/${originalName}`
-//       );
-
-//       const product = await Product.create({
-//         name: req.body.name,
-//         description: req.body.description,
-//         price: req.body.price,
-//         image: imageUrl,
-//       });
-
-//       return res.status(201).json({
-//         status: "product created successfully",
-//         data: product,
-//       });
-//     });
-//   } catch (err) {
-//     return next(err);
-//   }
-// };
-
-exports.addProduct = async (req, res) => {
-  const newProduct = await Product.create(req.body);
-  res.status(201).json({
-    status: "success",
-    data: {
-      product: newProduct,
-    },
-  });
+exports.addProduct = async (req, res, next) => {
+  try {
+    upload.single("file")(req, res, async (error) => {
+      if (error) {
+        console.log(error);
+        return res.status(400).json({
+          status: "fail",
+          message: "Error uploading file",
+        });
+      }
+      const formData = req.body;
+      const file = req.file;
+      if (!file) {
+        return res.status(404).json({
+          status: "fail",
+          message: "No File found",
+        });
+      }
+      const buffer = Buffer.from(file.buffer);
+      const resizedBuffer = await sharp(buffer)
+        .resize({ width: 400, height: 300 })
+        .toBuffer();
+      const { name, description, price } = formData;
+      const image = await uploadFileToS3(
+        resizedBuffer,
+        file.originalname,
+        "products"
+      );
+      const product = await Product.create({
+        name,
+        description,
+        price,
+        image,
+      });
+      return res.status(201).json({
+        status: "success",
+        message: "product created successfully",
+        data: product,
+      });
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      err,
+    });
+  }
 };
+
+// exports.addProduct = async (req, res) => {
+//   const newProduct = await Product.create(req.body);
+//   console.log(newProduct)
+//   const imgbuffer = Buffer(newProduct.image);
+
+//   res.status(201).json({
+//     status: "success",
+//     data: {
+//       product: newProduct,
+//     },
+//   });
+// };
 
 exports.getAllProducts = async (req, res) => {
   const product = await Product.find();
@@ -97,22 +96,21 @@ exports.deleteProduct = async (req, res) => {
 
 exports.editProduct = async (req, res) => {
   try {
-    const updatedProduct = await Product.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      {
-        new: true,
-      }
-    );
-
+    const id = req.params.id;
+    const updates = req.body;
+    const updatedProduct = await Product.findById(id);
     if (!updatedProduct) {
-      return res.status(404).json({ message: "Product not found" });
+      return res.status(404).send({ error: "Product not found" });
     }
+    Object.keys(updates).forEach((update) => {
+      updatedProduct[update] = updates[update];
+    });
+    await updatedProduct.save();
 
     res.status(200).json({
       status: "success",
       data: {
-        product: updatedProduct,
+        updatedProduct,
       },
     });
   } catch (error) {
