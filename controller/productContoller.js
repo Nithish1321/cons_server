@@ -9,7 +9,6 @@ exports.addProduct = async (req, res, next) => {
   try {
     upload.single("file")(req, res, async (error) => {
       if (error) {
-        console.log(error);
         return res.status(400).json({
           status: "fail",
           message: "Error uploading file",
@@ -52,19 +51,6 @@ exports.addProduct = async (req, res, next) => {
     });
   }
 };
-
-// exports.addProduct = async (req, res) => {
-//   const newProduct = await Product.create(req.body);
-//   console.log(newProduct)
-//   const imgbuffer = Buffer(newProduct.image);
-
-//   res.status(201).json({
-//     status: "success",
-//     data: {
-//       product: newProduct,
-//     },
-//   });
-// };
 
 exports.getAllProducts = async (req, res) => {
   const product = await Product.find();

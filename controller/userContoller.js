@@ -1,5 +1,5 @@
 const User = require("../modals/userModal");
-
+const createError = require("../utils/appError");
 exports.changeUserAddress = async (req, res, next) => {
   try {
     const userId = req.params.userId;
@@ -9,7 +9,6 @@ exports.changeUserAddress = async (req, res, next) => {
       { $set: { address, city, pincode } },
       { new: true, omitUndefined: true }
     );
-
     if (!updatedUser) {
       return next(new createError("User not found", 404));
     }

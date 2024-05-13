@@ -6,8 +6,6 @@ const User = require("../modals/userModal");
 exports.signup = async (req, res, next) => {
   try {
     const { name, email, phone, password, address, city, pincode } = req.body;
-    console.log(name, email, phone, password);
-
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return next(new createError("User already exist!", 400));

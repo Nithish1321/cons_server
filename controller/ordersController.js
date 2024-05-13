@@ -1,22 +1,3 @@
-// const Order = require("../modals/orderModal");
-// exports.createOrder = async (req, res) => {
-//   try {
-//     const { customerId, products, billAmount } = req.body;
-//     const newOrder = {
-//       customerId,
-//       products,
-//       billAmount,
-//     };
-
-//     const savedOrder = await Order.create(newOrder);
-
-//     res.status(201).json(savedOrder);
-//   } catch (error) {
-//     console.error("Error creating order:", error);
-//     res.status(500).json({ error: "Unable to create order" });
-//   }
-// };
-
 require("dotenv").config();
 const crypto = require("crypto");
 const Razorpay = require("razorpay");
@@ -78,7 +59,6 @@ exports.createUserOrder = async (req, res) => {
       status,
       totalQuantity
     );
-    // Create a new order document using create()
     const newOrder = await Order.create({
       payment_id,
       razorpay_order_id,

@@ -2,23 +2,40 @@ const Admin = require("../modals/adminModal");
 const User = require("../modals/userModal");
 const Product = require("../modals/productModal");
 const Order = require("../modals/orderModal");
+const createError = require("../utils/appError");
+const jwt = require("jsonwebtoken");
+exports.adminLogin = async (req, res, next) => {
+  try {
+    const { email, password } = req.body;
+    const user = await Admin.findOne({ email });
+    if (!user) return next(new createError("User not found!", 401));
+    if (password !== user.password) {
+      return next(new createError("Invalid password", 401));
+    }
 
-exports.adminLogin = async (req, res) => {
-  const { email, password } = req.body;
-  console.log(email, password);
+    const token = jwt.sign({ _id: user._id }, `${process.env.JWT_SECRET}`, {
+      expiresIn: "12h",
+    });
 
-  const admin = await Admin.find();
-  console.log(email);
-  if (email !== admin[0].email) {
-    return res.status(404).json({ login: false, message: "User not found" });
+    res.status(200).json({
+      status: "success",
+      token,
+      message: "Logged in successfully",
+      user: {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        phone: user.phone,
+        shippingAddress: {
+          street: user.address,
+          city: user.city,
+          pincode: user.pincode,
+        },
+      },
+    });
+  } catch (err) {
+    next(err);
   }
-  if (password !== admin[0].password) {
-    return res
-      .status(401)
-      .json({ login: false, message: "Invalid username or password" });
-  }
-
-  res.json({ login: true, message: "Login successful" });
 };
 
 exports.calculateStatistics = async (req, res) => {
