@@ -6,7 +6,13 @@ const adminRouter = require("./routes/adminRoute");
 const userRouter = require("./routes/userRouter");
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(cors());
+app.use(
+  cors({
+    origin: ["https://deploy-mern-1whq.vercel.app"],
+    methods: ["POST", "GET", "PATCH", "DELETE", "PUT"],
+    credentials: true,
+  })
+);
 app.use((req, res, next) => {
   next();
 });
