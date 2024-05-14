@@ -14,7 +14,8 @@ app.use((req, res, next) => {
   res.header(
     "Access-Control-Allow-Origin",
     "http://localhost:3000",
-    "https://dreamland-admin.vercel.app"
+    "https://dreamland-admin.vercel.app",
+    "https://dreamland-client.vercel.app"
   );
 
   res.header(
