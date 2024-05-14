@@ -45,15 +45,15 @@ exports.calculateStatistics = async (req, res) => {
 
     // Count the total number of products
     const totalProducts = await Product.countDocuments();
-
     // Count the total number of orders
     const totalOrders = await Order.countDocuments();
-    const orders = await Order.find({}, { billAmount: 1 }); // Fetch only billAmount field
+    const orders = await Order.find({}, { billAmount: 1 });
+    const orderstatus = await Order.find({}, { status: 1 });
     const totalRevenue = orders.reduce(
       (acc, order) => acc + order.billAmount,
       0
     );
-
+    const orderStatuses = orderstatus.map((order) => order.status);
     res.status(200).json({
       status: "success",
       statistics: {
@@ -61,6 +61,7 @@ exports.calculateStatistics = async (req, res) => {
         totalProducts: totalProducts,
         totalOrders: totalOrders,
         totalRevenue: totalRevenue,
+        orderStatus: orderStatuses,
       },
     });
   } catch (err) {
